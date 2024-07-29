@@ -9,6 +9,7 @@ import {
 } from "obsidian";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
+import pipe from "./src/pipe";
 
 interface PublishSettings {
 	outputPath: string;
@@ -110,7 +111,7 @@ export async function process({
 		lower: true,
 		strict: true,
 	});
-	const outputContent = stripWikilinks(removeNotes(content));
+	const outputContent = pipe(stripWikilinks, removeNotes)(content);
 
 	const outputFile = `${outputPath}/${slug}.mdx`;
 	await fs.writeFile(outputFile, outputContent);
