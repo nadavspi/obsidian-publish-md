@@ -1,5 +1,3 @@
-const pipe =
-	(...fns) =>
-	(x) =>
-		fns.reduce((v, f) => f(v), x);
+const pipe = <T>(fn1: (a: T) => T, ...fns: Array<(a: T) => T>) =>
+	fns.reduce((prevFn, nextFn) => (value) => prevFn(nextFn(value)), fn1);
 export default pipe;

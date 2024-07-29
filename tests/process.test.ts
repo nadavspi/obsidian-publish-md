@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import { rimraf } from "rimraf";
-import { process } from "../main";
+import process from "../src/process";
 
 beforeAll(async () => {
 	await rimraf("tests/output/**/*.mdx", { glob: true });
