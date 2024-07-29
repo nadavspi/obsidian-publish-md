@@ -73,7 +73,7 @@ class Settings extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Output path")
-			.setDesc("No trailing slash necessary")
+			.setDesc("Absolute path, no trailing slash")
 			.addText((text) =>
 				text
 					.setPlaceholder("~/docs/")
