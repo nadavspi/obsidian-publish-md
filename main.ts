@@ -112,8 +112,10 @@ export async function process({
 		strict: true,
 	});
 	const outputContent = pipe(stripWikilinks, removeNotes)(content);
+	const outputFile = [outputPath, frontmatter.type, `${slug}.mdx`]
+		.filter(Boolean)
+		.join("/");
 
-	const outputFile = `${outputPath}/${slug}.mdx`;
 	await fs.writeFile(outputFile, outputContent);
 	return outputFile;
 }

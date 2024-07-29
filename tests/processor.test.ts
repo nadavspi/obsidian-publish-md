@@ -1,9 +1,9 @@
-import * as fs from 'node:fs/promises';
+import * as fs from "node:fs/promises";
 import { rimraf } from "rimraf";
 import { process } from "../main";
 
 beforeAll(async () => {
-	await rimraf("tests/output/*", { glob: true });
+	await rimraf("tests/output/**/*.mdx", { glob: true });
 });
 
 const i = (basename: string): string => `tests/input/${basename}.md`;
@@ -69,4 +69,14 @@ and even more!
 `;
 
 	expect(output.toString("utf8")).toEqual(expected);
+});
+
+describe("put files in a subdirectory", () => {
+	test("based on type frontmatter property", async () => {
+		const basename = "with-type";
+		const input = await fs.readFile(i(basename));
+		await process({ basename, content: input.toString("utf8"), outputPath });
+		const output = await fs.readFile(o(`media/${basename}`));
+		expect(input).toEqual(output);
+	});
 });
