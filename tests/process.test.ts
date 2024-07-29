@@ -40,6 +40,7 @@ describe("slugify the filename", () => {
 		const input = await fs.readFile(i(basename));
 		await process({ basename, content: input.toString("utf8"), outputPath });
 		const output = await fs.readFile(o("fancy-custom-slug"));
+		expect(input).toEqual(output);
 	});
 });
 
