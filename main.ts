@@ -76,7 +76,7 @@ class Settings extends PluginSettingTab {
 			.setDesc("Absolute path, no trailing slash")
 			.addText((text) =>
 				text
-					.setPlaceholder("~/docs/")
+					.setPlaceholder("/home/user/docs")
 					.setValue(this.plugin.settings.outputPath)
 					.onChange(async (value) => {
 						this.plugin.settings.outputPath = value;
