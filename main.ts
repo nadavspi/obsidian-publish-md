@@ -12,7 +12,6 @@ interface PublishSettings {
 	outputPath: string;
 	defaultSubdir: string;
 }
-
 const DEFAULT_SETTINGS: PublishSettings = {
 	outputPath: "~/src/nadav.is/src/content/media/",
 	defaultSubdir: "",

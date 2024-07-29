@@ -65,6 +65,7 @@ test("strip wikilinks", async () => {
 	const output = await fs.readFile(o("with-wikilinks"));
 	const expected = `---
 ---
+boom
 here is a link. and another
 and even more!
 `;
@@ -93,4 +94,18 @@ describe("put files in a subdirectory", () => {
 		const output = await fs.readFile(o(`media/${basename}`));
 		expect(input).toEqual(output);
 	});
+});
+
+test.skip("rewrite image embeds", async () => {
+	const basename = "with-images";
+	const input = await fs.readFile(i(basename));
+	await process({ basename, content: input.toString("utf8"), outputPath });
+	const output = await fs.readFile(o(basename));
+	const expected = `---
+---
+content
+
+`;
+
+	expect(output.toString("utf8")).toEqual(expected);
 });

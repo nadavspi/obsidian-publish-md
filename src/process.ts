@@ -47,7 +47,11 @@ const removeNotes = (content: string): string =>
 	content.replace(/## Notes.*/s, "");
 
 const stripWikilinks = (content: string): string => {
-	return content.replace(/\[\[([^\]]+)\]\]/gm, (match, linkText) => {
-		return linkText;
+	// ([^\!]) capture, any char that isn't ! (to exclude media embeds)
+	// \[\[ 
+	// ([^\]]+) capture, any characters that aren't ]] or newline
+	// \]\]
+	return content.replace(/([^\!])\[\[([^\]]+)\]\]/gm, (match, before, linkText) => {
+		return `${before}${linkText}`;
 	});
 };
