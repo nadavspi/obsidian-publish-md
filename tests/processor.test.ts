@@ -15,7 +15,7 @@ test("should abort on files without frontmatter", async () => {
 	).rejects.toThrow("Invalid file: needs both frontmatter and content");
 });
 
-test("copies a simple file", async () => {
+test("copy a simple file", async () => {
 	await process("tests/input/simple.md", "tests/output/");
 	const input = await fs.readFile(i("simple"));
 	const output = await fs.readFile(o("simple"));
@@ -24,7 +24,7 @@ test("copies a simple file", async () => {
 
 describe("slugify the filename", () => {
 	test("based on the original filename", async () => {
-		await process(i("/Careful Now"), "tests/output/");
+		await process(i("Careful Now"), "tests/output/");
 		const input = await fs.readFile(i("Careful Now"));
 		const output = await fs.readFile(o("careful-now"));
 		expect(input).toEqual(output);
@@ -36,4 +36,16 @@ describe("slugify the filename", () => {
 		const output = await fs.readFile(o("fancy-custom-slug"));
 		expect(input).toEqual(output);
 	});
+});
+
+test("remove notes from the end of the file", async () => {
+	await process(i("with-private-notes"), "tests/output/");
+	const output = await fs.readFile(o("with-private-notes"));
+	const expected = `---
+---
+content
+
+`;
+
+	expect(output.toString("utf8")).toEqual(expected);
 });

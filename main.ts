@@ -125,21 +125,20 @@ export async function process(
 	outputPath: string,
 ): Promise<string> {
 	const fileContent = await fs.readFile(inputFile, "utf8");
-
 	const split = fileContent.split("---");
 	if (split.length !== 3) {
 		throw new Error("Invalid file: needs both frontmatter and content");
 	}
 
 	const frontmatter = parseYaml(split[1]) || {};
-
 	// use slug from frontmatter, else slugify original filename
 	const slug = slugify(frontmatter.slug || basename(inputFile, ".md"), {
 		lower: true,
 		strict: true,
 	});
+	const content = fileContent.replace(/## Notes.*/s, "");
 
 	const outputFile = `${outputPath}/${slug}.mdx`;
-	await fs.writeFile(outputFile, fileContent);
+	await fs.writeFile(outputFile, content);
 	return outputFile;
 }
