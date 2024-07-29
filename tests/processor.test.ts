@@ -79,4 +79,17 @@ describe("put files in a subdirectory", () => {
 		const output = await fs.readFile(o(`media/${basename}`));
 		expect(input).toEqual(output);
 	});
+
+	test("based on defaultSubdir setting", async () => {
+		const basename = "simple";
+		const input = await fs.readFile(i(basename));
+		await process({
+			basename,
+			content: input.toString("utf8"),
+			defaultSubdir: "media",
+			outputPath,
+		});
+		const output = await fs.readFile(o(`media/${basename}`));
+		expect(input).toEqual(output);
+	});
 });

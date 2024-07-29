@@ -13,6 +13,7 @@ import pipe from "./src/pipe";
 
 interface PublishSettings {
 	outputPath: string;
+	defaultSubdir?: string;
 }
 
 const DEFAULT_SETTINGS: PublishSettings = {
@@ -33,8 +34,9 @@ export default class Publish extends Plugin {
 					const content = editor.getValue();
 					const basename = this.app.workspace.getActiveFile()?.basename;
 					const output = await process({
-						content,
 						basename,
+						content,
+						defaultSubdir: this.settings.defaultSubdir,
 						outputPath: this.settings.outputPath,
 					});
 					new Notice(`Copied "${basename}"`);
@@ -83,18 +85,33 @@ class Settings extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}),
 			);
+
+		new Setting(containerEl)
+			.setName("Default subdirectory (optional)")
+			.setDesc("Put files without a frontmatter `type` in this subdirectory")
+			.addText((text) =>
+				text
+					.setPlaceholder("name")
+					.setValue(this.plugin.settings.defaultSubdir)
+					.onChange(async (value) => {
+						this.plugin.settings.defaultSubdir = value;
+						await this.plugin.saveSettings();
+					}),
+			);
 	}
 }
 
 interface Process {
 	basename: string | undefined;
 	content: string;
+	defaultSubdir?: string;
 	outputPath: string;
 }
 
 export async function process({
 	basename,
 	content,
+	defaultSubdir,
 	outputPath,
 }: Process): Promise<string> {
 	const split = content.split("---");
@@ -112,7 +129,7 @@ export async function process({
 		strict: true,
 	});
 	const outputContent = pipe(stripWikilinks, removeNotes)(content);
-	const outputFile = [outputPath, frontmatter.type, `${slug}.mdx`]
+	const outputFile = [outputPath, frontmatter.type || defaultSubdir, `${slug}.mdx`]
 		.filter(Boolean)
 		.join("/");
 
