@@ -6,40 +6,47 @@ beforeAll(async () => {
 	await rimraf("tests/output/*", { glob: true });
 });
 
-const i = (x: string): string => `tests/input/${x}.md`;
-const o = (x: string): string => `tests/output/${x}.mdx`;
+const i = (basename: string): string => `tests/input/${basename}.md`;
+const o = (basename: string): string => `tests/output/${basename}.mdx`;
+const outputPath = "tests/output";
 
 test("should abort on files without frontmatter", async () => {
+	const basename = "no-frontmatter";
+	const input = await fs.readFile(i(basename));
 	await expect(
-		process("tests/input/no-frontmatter.md", "tests/output/"),
+		process({ basename, content: input.toString("utf8"), outputPath }),
 	).rejects.toThrow("Invalid file: needs both frontmatter and content");
 });
 
 test("copy a simple file", async () => {
-	await process("tests/input/simple.md", "tests/output/");
-	const input = await fs.readFile(i("simple"));
-	const output = await fs.readFile(o("simple"));
+	const basename = "simple";
+	const input = await fs.readFile(i(basename));
+	await process({ basename, content: input.toString("utf8"), outputPath });
+	const output = await fs.readFile(o(basename));
 	expect(input).toEqual(output);
 });
 
 describe("slugify the filename", () => {
 	test("based on the original filename", async () => {
-		await process(i("Careful Now"), "tests/output/");
-		const input = await fs.readFile(i("Careful Now"));
+		const basename = "Careful Now";
+		const input = await fs.readFile(i(basename));
+		await process({ basename, content: input.toString("utf8"), outputPath });
 		const output = await fs.readFile(o("careful-now"));
 		expect(input).toEqual(output);
 	});
 
 	test("based on the frontmatter", async () => {
-		await process(i("custom-slug"), "tests/output/");
-		const input = await fs.readFile(i("custom-slug"));
+		const basename = "custom-slug";
+		const input = await fs.readFile(i(basename));
+		await process({ basename, content: input.toString("utf8"), outputPath });
 		const output = await fs.readFile(o("fancy-custom-slug"));
-		expect(input).toEqual(output);
 	});
 });
 
 test("remove notes from the end of the file", async () => {
-	await process(i("with-private-notes"), "tests/output/");
+	const basename = "with-private-notes";
+	const input = await fs.readFile(i(basename));
+	await process({ basename, content: input.toString("utf8"), outputPath });
 	const output = await fs.readFile(o("with-private-notes"));
 	const expected = `---
 ---

@@ -1,6 +1,12 @@
 import { promises as fs } from "fs";
-import { Plugin, PluginSettingTab, Setting, type App } from "obsidian";
-import { basename } from "path";
+import {
+    Notice,
+    Plugin,
+    PluginSettingTab,
+    Setting,
+    type App,
+    type Editor
+} from "obsidian";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
 
@@ -22,13 +28,22 @@ export default class Publish extends Plugin {
 		this.addCommand({
 			id: "publish-current-file",
 			name: "Publish current file",
-			callback: () => {
-				console.log("cool");
-				// process(inputFile, this.settings.outputPath)
+			editorCallback: async (editor: Editor) => {
+				try {
+					const content = editor.getValue();
+					const basename = this.app.workspace.getActiveFile()?.basename;
+					const output = await process({
+						content,
+						basename,
+						outputPath: this.settings.outputPath,
+					});
+					new Notice(`Copied "${basename}"`);
+				} catch (error: unknown) {
+					new Notice(`${error}`);
+				}
 			},
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new Settings(this.app, this));
 	}
 
@@ -58,9 +73,7 @@ class Settings extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Output path")
-			.setDesc(
-				"Where should we put the processed files?\nInclude trailing slash.",
-			)
+			.setDesc("No trailing slash necessary")
 			.addText((text) =>
 				text
 					.setPlaceholder("~/docs/")
@@ -73,25 +86,34 @@ class Settings extends PluginSettingTab {
 	}
 }
 
-export async function process(
-	inputFile: string,
-	outputPath: string,
-): Promise<string> {
-	const fileContent = await fs.readFile(inputFile, "utf8");
-	const split = fileContent.split("---");
+interface Process {
+	basename: string | undefined;
+	content: string;
+	outputPath: string;
+}
+
+export async function process({
+	basename,
+	content,
+	outputPath,
+}: Process): Promise<string> {
+	const split = content.split("---");
 	if (split.length !== 3) {
 		throw new Error("Invalid file: needs both frontmatter and content");
+	}
+	if (!basename) {
+		throw new Error("Give me the basename");
 	}
 
 	const frontmatter = parseYaml(split[1]) || {};
 	// use slug from frontmatter, else slugify original filename
-	const slug = slugify(frontmatter.slug || basename(inputFile, ".md"), {
+	const slug = slugify(frontmatter.slug || basename, {
 		lower: true,
 		strict: true,
 	});
-	const content = fileContent.replace(/## Notes.*/s, "");
+	const outputContent = content.replace(/## Notes.*/s, "");
 
 	const outputFile = `${outputPath}/${slug}.mdx`;
-	await fs.writeFile(outputFile, content);
+	await fs.writeFile(outputFile, outputContent);
 	return outputFile;
 }
