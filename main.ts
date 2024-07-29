@@ -1,11 +1,11 @@
-import * as fs from 'node:fs/promises';
+import * as fs from "node:fs/promises";
 import {
-    Notice,
-    Plugin,
-    PluginSettingTab,
-    Setting,
-    type App,
-    type Editor
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  type App,
+  type Editor
 } from "obsidian";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
@@ -111,9 +111,18 @@ export async function process({
 		lower: true,
 		strict: true,
 	});
-	const outputContent = content.replace(/## Notes.*/s, "");
+	const outputContent = stripWikilinks(removeNotes(content));
 
 	const outputFile = `${outputPath}/${slug}.mdx`;
 	await fs.writeFile(outputFile, outputContent);
 	return outputFile;
 }
+
+const removeNotes = (content: string): string =>
+	content.replace(/## Notes.*/s, "");
+
+const stripWikilinks = (content: string): string => {
+	return content.replace(/\[\[([^\]]+)\]\]/gm, (match, linkText) => {
+		return linkText;
+	});
+};

@@ -56,3 +56,17 @@ content
 
 	expect(output.toString("utf8")).toEqual(expected);
 });
+
+test("strip wikilinks", async () => {
+	const basename = "with-wikilinks";
+	const input = await fs.readFile(i(basename));
+	await process({ basename, content: input.toString("utf8"), outputPath });
+	const output = await fs.readFile(o("with-wikilinks"));
+	const expected = `---
+---
+here is a link. and another
+and even more!
+`;
+
+	expect(output.toString("utf8")).toEqual(expected);
+});
