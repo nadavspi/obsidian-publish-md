@@ -1,22 +1,15 @@
 import { promises as fs } from "fs";
-import {
-    App,
-    Editor,
-    MarkdownView,
-    Plugin,
-    PluginSettingTab,
-    Setting
-} from "obsidian";
+import { Plugin, PluginSettingTab, Setting, type App } from "obsidian";
 import { basename } from "path";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
 
 interface PublishSettings {
-	targetPath: string;
+	outputPath: string;
 }
 
 const DEFAULT_SETTINGS: PublishSettings = {
-	targetPath: "default",
+	outputPath: "~/src/nadav.is/src/content/media/",
 };
 
 export default class Publish extends Plugin {
@@ -27,44 +20,16 @@ export default class Publish extends Plugin {
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: "open-sample-modal-simple",
-			name: "Open sample modal (simple)",
+			id: "publish-current-file",
+			name: "Publish current file",
 			callback: () => {
-				new SampleModal(this.app).open();
-			},
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: "sample-editor-command",
-			name: "Sample editor command",
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection("Sample Editor Command");
-			},
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: "open-sample-modal-complex",
-			name: "Open sample modal (complex)",
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView =
-					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
+				console.log("cool");
+				// process(inputFile, this.settings.outputPath)
 			},
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new Settings(this.app, this));
 	}
 
 	onunload() {}
@@ -78,21 +43,7 @@ export default class Publish extends Plugin {
 	}
 }
 
-class SampleModal {
-	constructor(app: App) {}
-
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText("Woah!");
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
+class Settings extends PluginSettingTab {
 	plugin: Publish;
 
 	constructor(app: App, plugin: Publish) {
@@ -106,14 +57,16 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Setting #1")
-			.setDesc("It's a secret")
+			.setName("Output path")
+			.setDesc(
+				"Where should we put the processed files?\nInclude trailing slash.",
+			)
 			.addText((text) =>
 				text
-					.setPlaceholder("Enter your secret")
-					.setValue(this.plugin.settings.targetPath)
+					.setPlaceholder("~/docs/")
+					.setValue(this.plugin.settings.outputPath)
 					.onChange(async (value) => {
-						this.plugin.settings.targetPath = value;
+						this.plugin.settings.outputPath = value;
 						await this.plugin.saveSettings();
 					}),
 			);
