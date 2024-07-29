@@ -24,7 +24,6 @@ export default class Publish extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
 			id: "publish-current-file",
 			name: "Publish current file",
