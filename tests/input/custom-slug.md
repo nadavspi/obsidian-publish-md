@@ -1,0 +1,4 @@
+---
+slug: fancy-custom-slug
+---
+
