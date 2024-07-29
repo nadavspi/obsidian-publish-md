@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import * as fs from 'node:fs/promises';
 import { rimraf } from "rimraf";
 import { process } from "../main";
 

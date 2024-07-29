@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import * as fs from 'node:fs/promises';
 import {
     Notice,
     Plugin,
