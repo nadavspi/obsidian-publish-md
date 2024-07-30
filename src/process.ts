@@ -11,6 +11,11 @@ interface Process {
 	outputPath: string;
 }
 
+export interface ProcessorParams {
+	content: string;
+	slug: string;
+}
+
 export default async function process({
 	basename,
 	content,
@@ -31,11 +36,11 @@ export default async function process({
 		lower: true,
 		strict: true,
 	});
-	const outputContent = pipe(
+	const { content: outputContent } = pipe(
 		stripWikilinks,
 		removeNotes,
 		rewriteImages,
-	)(content);
+	)({ content, slug });
 	const outputFile = [
 		outputPath,
 		frontmatter.type || defaultSubdir,
@@ -48,18 +53,25 @@ export default async function process({
 	return outputFile;
 }
 
-const removeNotes = (content: string): string =>
-	content.replace(/## Notes.*/s, "");
+const removeNotes = (params: ProcessorParams): ProcessorParams => {
+	return {
+		...params,
+		content: params.content.replace(/## Notes.*/s, ""),
+	};
+};
 
-const stripWikilinks = (content: string): string => {
-	// ([^\!]) capture, any char that isn't ! (to exclude media embeds)
-	// \[\[
-	// ([^\]]+) capture, any characters that aren't ]] or newline
-	// \]\]
-	return content.replace(
-		/([^\!])\[\[([^\]]+)\]\]/gm,
-		(match, before, linkText) => {
-			return `${before}${linkText}`;
-		},
-	);
+const stripWikilinks = (params: ProcessorParams): ProcessorParams => {
+	return {
+		...params,
+		content: params.content.replace(
+			// ([^\!]) capture, any char that isn't ! (to exclude media embeds)
+			// \[\[
+			// ([^\]]+) capture, any characters that aren't ]] or newline
+			// \]\]
+			/([^\!])\[\[([^\]]+)\]\]/gm,
+			(match, before, linkText) => {
+				return `${before}${linkText}`;
+			},
+		),
+	};
 };

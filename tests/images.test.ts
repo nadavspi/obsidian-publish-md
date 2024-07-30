@@ -10,7 +10,7 @@ describe("parseImages", () => {
 			"![[An.Elephant.Sitting.Still-1.jpg]]",
 			"![[a-png-now.png]]",
 		].join("\n");
-		const output = parseImages(content);
+		const output = parseImages({ content, slug: "" });
 		const expected = {
 			content: [
 				`<Image src={anElephantSittingStill_1} alt="" />`,

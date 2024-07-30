@@ -1,4 +1,5 @@
 import { camelCase } from "change-case";
+import { type ProcessorParams } from "./process";
 
 interface Image {
 	filename: string;
@@ -22,10 +23,10 @@ export const parseImages = (content: string): ContentAndImages => {
 	return { content: nextContent, images };
 };
 
-const rewriteImages = (content: string): string => {
-	const { content: nextContent, images } = parseImages(content);
+const rewriteImages = (params: ProcessorParams): ProcessorParams => {
+	const { content: nextContent, images } = parseImages(params.content);
 	if (!images.length) {
-		return content;
+		return params;
 	}
 
 	const [, frontmatter, body] = nextContent.split("---");
@@ -34,6 +35,9 @@ const rewriteImages = (content: string): string => {
 	});
 
 	const outputFrontmatter = ["---", frontmatter, "---"].join("");
-	return [outputFrontmatter, imports.join("\n"), body].join("\n");
+	return {
+		...params,
+		content: [outputFrontmatter, imports.join("\n"), body].join("\n"),
+	};
 };
 export default rewriteImages;
