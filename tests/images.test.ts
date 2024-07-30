@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import { parseImages } from "../src/rewriteImages";
-import { i } from "./test-helpers";
+import { i, settings } from "./test-helpers";
 
 describe("parseImages", () => {
 	test("returns nextContent and imports as expected", async () => {
@@ -10,7 +10,7 @@ describe("parseImages", () => {
 			"![[An.Elephant.Sitting.Still-1.jpg]]",
 			"![[a-png-now.png]]",
 		].join("\n");
-		const output = parseImages({ content, slug: "" });
+		const output = parseImages({ content, slug: "", settings });
 		const expected = {
 			content: [
 				`<Image src={anElephantSittingStill_1} alt="" />`,

@@ -3,24 +3,26 @@ import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
 import pipe from "./pipe";
 import rewriteImages from "./rewriteImages";
+import type { PublishSettings } from "./types";
 
 interface Process {
 	basename: string | undefined;
 	content: string;
 	defaultSubdir?: string;
-	outputPath: string;
+	settings: PublishSettings;
 }
 
 export interface ProcessorParams {
 	content: string;
 	slug: string;
+	settings: PublishSettings;
 }
 
 export default async function process({
 	basename,
 	content,
 	defaultSubdir,
-	outputPath,
+	settings,
 }: Process): Promise<string> {
 	const split = content.split("---");
 	if (split.length !== 3) {
@@ -40,9 +42,9 @@ export default async function process({
 		stripWikilinks,
 		removeNotes,
 		rewriteImages,
-	)({ content, slug });
+	)({ content, slug, settings });
 	const outputFile = [
-		outputPath,
+		settings.outputPath,
 		frontmatter.type || defaultSubdir,
 		`${slug}.mdx`,
 	]

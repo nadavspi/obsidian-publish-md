@@ -12,8 +12,10 @@ interface ContentAndImages {
 }
 export const parseImages = (params: ProcessorParams): ContentAndImages => {
 	const images: Image[] = [];
+	const extensions = params.settings.imageFileExtensions.join("|");
 	const nextContent = params.content.replace(
-		/!\[\[([^\]]+)\.(jpg|png|jpeg|webp)\]\]/gm,
+		// have to double escape \ (once for the string, once for the regexp)
+		new RegExp(`!\\[\\[([^\\]]+)\\.(${extensions})\\]\\]`, "gm"),
 		(match, filename, ext) => {
 			const name = camelCase(filename);
 			images.push({ ext, filename, name });

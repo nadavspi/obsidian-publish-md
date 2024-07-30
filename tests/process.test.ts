@@ -1,7 +1,7 @@
 import * as fs from "node:fs/promises";
 import { rimraf } from "rimraf";
 import process from "../src/process";
-import { i, o, outputPath } from "./test-helpers";
+import { i, o, settings } from "./test-helpers";
 
 beforeAll(async () => {
 	await rimraf("tests/output/**/*.mdx", { glob: true });
@@ -11,14 +11,14 @@ test("should abort on files without frontmatter", async () => {
 	const basename = "no-frontmatter";
 	const input = await fs.readFile(i(basename));
 	await expect(
-		process({ basename, content: input.toString("utf8"), outputPath }),
+		process({ settings, basename, content: input.toString("utf8") }),
 	).rejects.toThrow("Invalid file: needs both frontmatter and content");
 });
 
 test("copy a simple file", async () => {
 	const basename = "simple";
 	const input = await fs.readFile(i(basename));
-	await process({ basename, content: input.toString("utf8"), outputPath });
+	await process({ settings, basename, content: input.toString("utf8") });
 	const output = await fs.readFile(o(basename));
 	expect(input).toEqual(output);
 });
@@ -27,7 +27,7 @@ describe("slugify the filename", () => {
 	test("based on the original filename", async () => {
 		const basename = "Careful Now";
 		const input = await fs.readFile(i(basename));
-		await process({ basename, content: input.toString("utf8"), outputPath });
+		await process({ settings, basename, content: input.toString("utf8") });
 		const output = await fs.readFile(o("careful-now"));
 		expect(input).toEqual(output);
 	});
@@ -35,7 +35,7 @@ describe("slugify the filename", () => {
 	test("based on the frontmatter", async () => {
 		const basename = "custom-slug";
 		const input = await fs.readFile(i(basename));
-		await process({ basename, content: input.toString("utf8"), outputPath });
+		await process({ settings, basename, content: input.toString("utf8") });
 		const output = await fs.readFile(o("fancy-custom-slug"));
 		expect(input).toEqual(output);
 	});
@@ -44,7 +44,7 @@ describe("slugify the filename", () => {
 test("remove notes from the end of the file", async () => {
 	const basename = "with-private-notes";
 	const input = await fs.readFile(i(basename));
-	await process({ basename, content: input.toString("utf8"), outputPath });
+	await process({ settings, basename, content: input.toString("utf8") });
 	const output = await fs.readFile(o("with-private-notes"));
 	const expected = `---
 ---
@@ -58,7 +58,7 @@ content
 test("strip wikilinks", async () => {
 	const basename = "with-wikilinks";
 	const input = await fs.readFile(i(basename));
-	await process({ basename, content: input.toString("utf8"), outputPath });
+	await process({ settings, basename, content: input.toString("utf8") });
 	const output = await fs.readFile(o("with-wikilinks"));
 	const expected = `---
 ---
@@ -74,7 +74,7 @@ describe("put files in a subdirectory", () => {
 	test("based on type frontmatter property", async () => {
 		const basename = "with-type";
 		const input = await fs.readFile(i(basename));
-		await process({ basename, content: input.toString("utf8"), outputPath });
+		await process({ basename, content: input.toString("utf8"), settings });
 		const output = await fs.readFile(o(`media/${basename}`));
 		expect(input).toEqual(output);
 	});
@@ -86,7 +86,7 @@ describe("put files in a subdirectory", () => {
 			basename,
 			content: input.toString("utf8"),
 			defaultSubdir: "media",
-			outputPath,
+			settings,
 		});
 		const output = await fs.readFile(o(`media/${basename}`));
 		expect(input).toEqual(output);
@@ -96,7 +96,7 @@ describe("put files in a subdirectory", () => {
 test("rewrite image embeds", async () => {
 	const basename = "with-images";
 	const input = await fs.readFile(i(basename));
-	await process({ basename, content: input.toString("utf8"), outputPath });
+	await process({ basename, content: input.toString("utf8"), settings });
 	const output = await fs.readFile(o(basename));
 	const expected = `---
 titleTranslated: A League of Nobleman
