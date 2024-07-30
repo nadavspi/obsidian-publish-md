@@ -2,6 +2,7 @@ import * as fs from "node:fs/promises";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
 import pipe from "./pipe";
+import rewriteImages from "./rewriteImages";
 
 interface Process {
 	basename: string | undefined;
@@ -30,7 +31,11 @@ export default async function process({
 		lower: true,
 		strict: true,
 	});
-	const outputContent = pipe(stripWikilinks, removeNotes)(content);
+	const outputContent = pipe(
+		stripWikilinks,
+		removeNotes,
+		rewriteImages,
+	)(content);
 	const outputFile = [
 		outputPath,
 		frontmatter.type || defaultSubdir,
@@ -48,10 +53,13 @@ const removeNotes = (content: string): string =>
 
 const stripWikilinks = (content: string): string => {
 	// ([^\!]) capture, any char that isn't ! (to exclude media embeds)
-	// \[\[ 
+	// \[\[
 	// ([^\]]+) capture, any characters that aren't ]] or newline
 	// \]\]
-	return content.replace(/([^\!])\[\[([^\]]+)\]\]/gm, (match, before, linkText) => {
-		return `${before}${linkText}`;
-	});
+	return content.replace(
+		/([^\!])\[\[([^\]]+)\]\]/gm,
+		(match, before, linkText) => {
+			return `${before}${linkText}`;
+		},
+	);
 };
