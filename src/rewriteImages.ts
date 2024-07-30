@@ -10,9 +10,9 @@ interface ContentAndImages {
 	content: string;
 	images: Image[];
 }
-export const parseImages = (content: string): ContentAndImages => {
+export const parseImages = (params: ProcessorParams): ContentAndImages => {
 	const images: Image[] = [];
-	const nextContent = content.replace(
+	const nextContent = params.content.replace(
 		/!\[\[([^\]]+)\.(jpg|png|jpeg|webp)\]\]/gm,
 		(match, filename, ext) => {
 			const name = camelCase(filename);
@@ -24,14 +24,14 @@ export const parseImages = (content: string): ContentAndImages => {
 };
 
 const rewriteImages = (params: ProcessorParams): ProcessorParams => {
-	const { content: nextContent, images } = parseImages(params.content);
+	const { content: nextContent, images } = parseImages(params);
 	if (!images.length) {
 		return params;
 	}
 
 	const [, frontmatter, body] = nextContent.split("---");
 	const imports = images.map(({ name, filename, ext }) => {
-		return `import ${name} from "./${filename}.${ext}";`;
+		return `import ${name} from "./${params.slug}/${filename}.${ext}";`;
 	});
 
 	const outputFrontmatter = ["---", frontmatter, "---"].join("");

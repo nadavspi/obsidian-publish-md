@@ -105,9 +105,9 @@ date: 2024-07-27
 yearPublished: 2023
 category: TV
 ---
-import anElephantSittingStill_1 from "./An.Elephant.Sitting.Still-1.jpg";
-import aPngNow from "./a-png-now.png";
-import aJpegWithSpacesInTheName from "./a jpeg with spaces in the name.jpeg";
+import anElephantSittingStill_1 from "./with-images/An.Elephant.Sitting.Still-1.jpg";
+import aPngNow from "./with-images/a-png-now.png";
+import aJpegWithSpacesInTheName from "./with-images/a jpeg with spaces in the name.jpeg";
 
 we've got images
 
