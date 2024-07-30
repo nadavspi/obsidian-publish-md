@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import { rimraf } from "rimraf";
-import process from "../src/process";
+import process, { parseImages } from "../src/process";
 
 beforeAll(async () => {
 	await rimraf("tests/output/**/*.mdx", { glob: true });
@@ -96,16 +96,61 @@ describe("put files in a subdirectory", () => {
 	});
 });
 
-test.skip("rewrite image embeds", async () => {
+test("rewrite image embeds", async () => {
 	const basename = "with-images";
 	const input = await fs.readFile(i(basename));
 	await process({ basename, content: input.toString("utf8"), outputPath });
 	const output = await fs.readFile(o(basename));
 	const expected = `---
+titleTranslated: A League of Nobleman
+title: 君子盟
+date: 2024-07-27
+yearPublished: 2023
+category: TV
 ---
-content
+import anElephantSittingStill_1 from "./An.Elephant.Sitting.Still-1.jpg";
+import aPngNow from "./a-png-now.png";
+import "aJpegWithSpacesInTheName" from "./a jpeg with spaces in the name.jpeg";
 
+we've got images
+
+<Image src={anElephantSittingStill_1} alt="" />
+
+<Image src={aPngNow} alt="" />
+
+<Image src={aJpegWithSpacesInTheName} alt="" />
 `;
 
 	expect(output.toString("utf8")).toEqual(expected);
+});
+
+describe("parseImages", () => {
+	test("returns nextContent and imports as expected", async () => {
+		const basename = "with-images";
+		const input = await fs.readFile(i(basename));
+		const content = [
+			"![[An.Elephant.Sitting.Still-1.jpg]]",
+			"![[a-png-now.png]]",
+		].join("\n");
+		const output = parseImages(content);
+		const expected = {
+			nextContent: [
+				`<Image src={anElephantSittingStill_1} alt="" />`,
+				`<Image src={aPngNow} alt="" />`,
+			].join("\n"),
+			imports: [
+				{
+					ext: "jpg",
+					filename: "An.Elephant.Sitting.Still-1",
+					name: "anElephantSittingStill_1",
+				},
+				{
+					ext: "png",
+					filename: "a-png-now",
+					name: "aPngNow",
+				},
+			],
+		};
+		expect(output).toEqual(expected);
+	});
 });

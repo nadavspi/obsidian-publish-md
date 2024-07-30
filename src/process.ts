@@ -1,4 +1,5 @@
 import * as fs from "node:fs/promises";
+import { camelCase } from "change-case";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
 import pipe from "./pipe";
@@ -48,10 +49,34 @@ const removeNotes = (content: string): string =>
 
 const stripWikilinks = (content: string): string => {
 	// ([^\!]) capture, any char that isn't ! (to exclude media embeds)
-	// \[\[ 
+	// \[\[
 	// ([^\]]+) capture, any characters that aren't ]] or newline
 	// \]\]
-	return content.replace(/([^\!])\[\[([^\]]+)\]\]/gm, (match, before, linkText) => {
-		return `${before}${linkText}`;
-	});
+	return content.replace(
+		/([^\!])\[\[([^\]]+)\]\]/gm,
+		(match, before, linkText) => {
+			return `${before}${linkText}`;
+		},
+	);
 };
+
+interface Import {
+	filename: string;
+	ext: string;
+	name: string;
+}
+export const parseImages = (
+	content: string,
+): { nextContent: string; imports: Import[] } => {
+	const imports: Import[] = [];
+	const nextContent = content.replace(
+		/!\[\[([^\]]+)\.(jpg|png|jpeg|webp)\]\]/gm,
+		(match, filename, ext) => {
+			const name = camelCase(filename) ;
+			imports.push({ ext, filename, name });
+			return `<Image src={${name}} alt="" />`;
+		},
+	);
+	return { nextContent, imports };
+};
+
