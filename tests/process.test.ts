@@ -110,7 +110,7 @@ category: TV
 ---
 import anElephantSittingStill_1 from "./An.Elephant.Sitting.Still-1.jpg";
 import aPngNow from "./a-png-now.png";
-import "aJpegWithSpacesInTheName" from "./a jpeg with spaces in the name.jpeg";
+import aJpegWithSpacesInTheName from "./a jpeg with spaces in the name.jpeg";
 
 we've got images
 
@@ -134,11 +134,11 @@ describe("parseImages", () => {
 		].join("\n");
 		const output = parseImages(content);
 		const expected = {
-			nextContent: [
+			content: [
 				`<Image src={anElephantSittingStill_1} alt="" />`,
 				`<Image src={aPngNow} alt="" />`,
 			].join("\n"),
-			imports: [
+			images: [
 				{
 					ext: "jpg",
 					filename: "An.Elephant.Sitting.Still-1",
