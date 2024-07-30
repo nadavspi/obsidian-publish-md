@@ -1,14 +1,11 @@
 import * as fs from "node:fs/promises";
 import { rimraf } from "rimraf";
-import process, { parseImages } from "../src/process";
+import process from "../src/process";
+import { i, o, outputPath } from "./test-helpers";
 
 beforeAll(async () => {
 	await rimraf("tests/output/**/*.mdx", { glob: true });
 });
-
-const i = (basename: string): string => `tests/input/${basename}.md`;
-const o = (basename: string): string => `tests/output/${basename}.mdx`;
-const outputPath = "tests/output";
 
 test("should abort on files without frontmatter", async () => {
 	const basename = "no-frontmatter";
@@ -122,35 +119,4 @@ we've got images
 `;
 
 	expect(output.toString("utf8")).toEqual(expected);
-});
-
-describe("parseImages", () => {
-	test("returns nextContent and imports as expected", async () => {
-		const basename = "with-images";
-		const input = await fs.readFile(i(basename));
-		const content = [
-			"![[An.Elephant.Sitting.Still-1.jpg]]",
-			"![[a-png-now.png]]",
-		].join("\n");
-		const output = parseImages(content);
-		const expected = {
-			content: [
-				`<Image src={anElephantSittingStill_1} alt="" />`,
-				`<Image src={aPngNow} alt="" />`,
-			].join("\n"),
-			images: [
-				{
-					ext: "jpg",
-					filename: "An.Elephant.Sitting.Still-1",
-					name: "anElephantSittingStill_1",
-				},
-				{
-					ext: "png",
-					filename: "a-png-now",
-					name: "aPngNow",
-				},
-			],
-		};
-		expect(output).toEqual(expected);
-	});
 });
