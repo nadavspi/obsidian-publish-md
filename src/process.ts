@@ -1,8 +1,7 @@
 import * as fs from "node:fs/promises";
 import { basename as pathBasename } from "node:path";
-import { Notice } from "obsidian";
+import { Notice, parseYaml } from "obsidian";
 import slugify from "slugify";
-import { parse as parseYaml } from "yaml";
 import type Publish from "../main";
 import pipe from "./pipe";
 import rewriteImages from "./rewriteImages";
