@@ -1,20 +1,18 @@
 import {
-    Notice,
-    Plugin,
-    PluginSettingTab,
-    Setting,
-    type App,
-    type Editor
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  type App,
+  type Editor
 } from "obsidian";
 import process from "./src/process";
+import type { PublishSettings } from "./src/types";
 
-interface PublishSettings {
-	outputPath: string;
-	defaultSubdir: string;
-}
 const DEFAULT_SETTINGS: PublishSettings = {
 	outputPath: "~/src/nadav.is/src/content/media/",
 	defaultSubdir: "",
+	imageFileExtensions: ["jpg", "png", "jpeg", "webp"],
 };
 
 export default class Publish extends Plugin {
@@ -34,7 +32,8 @@ export default class Publish extends Plugin {
 						basename,
 						content,
 						defaultSubdir: this.settings.defaultSubdir,
-						outputPath: this.settings.outputPath,
+						settings: this.settings,
+						plugin: this,
 					});
 					new Notice(`Copied "${basename}"`);
 				} catch (error: unknown) {

@@ -1,4 +1,4 @@
-import { FileManager, MetadataCache, Notice as ONotice, UserEvent, Vault, Workspace } from 'obsidian';
+import type { FileManager, MetadataCache, Notice as ONotice, UserEvent, Vault, Workspace } from 'obsidian';
 
 export class Notice implements ONotice {
   noticeEl: HTMLElement = {
@@ -35,3 +35,5 @@ export class App {
 
 export class Plugin {} 
 export class PluginSettingTab  {}
+export class Setting  {}
+export class Editor  {}

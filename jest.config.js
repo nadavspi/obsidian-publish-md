@@ -1,5 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
 module.exports = {
+	globalSetup: "./tests/global-setup.js",
 	extensionsToTreatAsEsm: [".ts"],
 	moduleNameMapper: {
 		"^(\\.{1,2}/.*)\\.js$": "$1",

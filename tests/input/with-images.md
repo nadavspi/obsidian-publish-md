@@ -7,8 +7,8 @@ category: TV
 ---
 we've got images
 
-![[An.Elephant.Sitting.Still-1.jpg]]
+![[black square.jpg]]
 
-![[a-png-now.png]]
+![[white-square.png]]
 
-![[a jpeg with spaces in the name.jpeg]]
+![[square.jpeg]]
