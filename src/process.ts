@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import slugify from "slugify";
 import { parse as parseYaml } from "yaml";
+import Publish from "../main";
 import pipe from "./pipe";
 import rewriteImages from "./rewriteImages";
 import type { PublishSettings } from "./types";
@@ -10,6 +11,7 @@ interface Process {
 	content: string;
 	defaultSubdir?: string;
 	settings: PublishSettings;
+	plugin: Publish;
 }
 
 export interface ProcessorParams {
@@ -23,6 +25,7 @@ export default async function process({
 	content,
 	defaultSubdir,
 	settings,
+	plugin,
 }: Process): Promise<string> {
 	const split = content.split("---");
 	if (split.length !== 3) {
@@ -51,6 +54,8 @@ export default async function process({
 		.filter(Boolean)
 		.join("/");
 
+	const images = await getImages({ settings, plugin });
+
 	await fs.writeFile(outputFile, outputContent);
 	return outputFile;
 }
@@ -76,4 +81,25 @@ const stripWikilinks = (params: ProcessorParams): ProcessorParams => {
 			},
 		),
 	};
+};
+
+const getImages = ({
+	settings,
+	plugin,
+}: { settings: PublishSettings; plugin: Publish }): string[] => {
+	const file = plugin.app.workspace.getActiveFile()?.path;
+	if (!file) {
+		throw new Error("No active file");
+	}
+	const links: string[] = Object.keys(
+		plugin.app.metadataCache.resolvedLinks[
+			// @ts-ignore we checked that there's a file
+			plugin.app.workspace.getActiveFile().path
+		],
+	);
+	const images = links.filter((link) =>
+		settings.imageFileExtensions.some((ext) => link.endsWith(ext)),
+	);
+	console.log({ links, images });
+	return images;
 };

@@ -1,10 +1,10 @@
 import {
-    Notice,
-    Plugin,
-    PluginSettingTab,
-    Setting,
-    type App,
-    type Editor
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  type App,
+  type Editor
 } from "obsidian";
 import process from "./src/process";
 import type { PublishSettings } from "./src/types";
@@ -33,6 +33,7 @@ export default class Publish extends Plugin {
 						content,
 						defaultSubdir: this.settings.defaultSubdir,
 						settings: this.settings,
+						plugin: this,
 					});
 					new Notice(`Copied "${basename}"`);
 				} catch (error: unknown) {
