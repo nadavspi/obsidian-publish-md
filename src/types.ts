@@ -3,3 +3,10 @@ export interface PublishSettings {
 	defaultSubdir: string;
 	imageFileExtensions: string[];
 }
+
+export interface ProcessorParams {
+	content: string;
+	slug: string;
+	settings: PublishSettings;
+}
+

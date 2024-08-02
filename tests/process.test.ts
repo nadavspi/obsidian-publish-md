@@ -1,89 +1,41 @@
 import * as fs from "node:fs/promises";
-import process from "../src/process";
-import { i, o, settings } from "./test-helpers";
-
-test("should abort on files without frontmatter", async () => {
-	const basename = "no-frontmatter";
-	const input = await fs.readFile(i(basename));
-	await expect(
-		process({ settings, basename, content: input.toString("utf8") }),
-	).rejects.toThrow("Invalid file: needs both frontmatter and content");
-});
-
-test("copy a simple file", async () => {
-	const basename = "simple";
-	const input = await fs.readFile(i(basename));
-	await process({ settings, basename, content: input.toString("utf8") });
-	const output = await fs.readFile(o(basename));
-	expect(input).toEqual(output);
-});
-
-describe("slugify the filename", () => {
-	test("based on the original filename", async () => {
-		const basename = "Careful Now";
-		const input = await fs.readFile(i(basename));
-		await process({ settings, basename, content: input.toString("utf8") });
-		const output = await fs.readFile(o("careful-now"));
-		expect(input).toEqual(output);
-	});
-
-	test("based on the frontmatter", async () => {
-		const basename = "custom-slug";
-		const input = await fs.readFile(i(basename));
-		await process({ settings, basename, content: input.toString("utf8") });
-		const output = await fs.readFile(o("fancy-custom-slug"));
-		expect(input).toEqual(output);
-	});
-});
+import removeNotes from "../src/processors/removeNotes";
+import stripWikilinks from "../src/processors/stripWikilinks";
+import { i, o, settings, slug } from "./test-helpers";
 
 test("remove notes from the end of the file", async () => {
-	const basename = "with-private-notes";
-	const input = await fs.readFile(i(basename));
-	await process({ settings, basename, content: input.toString("utf8") });
-	const output = await fs.readFile(o("with-private-notes"));
+	const content = `---
+---
+content
+
+## Notes
+
+big secrets here
+`;
 	const expected = `---
 ---
 content
 
 `;
 
-	expect(output.toString("utf8")).toEqual(expected);
+	const output = removeNotes({ content, settings, slug });
+	expect(output.content).toEqual(expected);
 });
 
 test("strip wikilinks", async () => {
-	const basename = "with-wikilinks";
-	const input = await fs.readFile(i(basename));
-	await process({ settings, basename, content: input.toString("utf8") });
-	const output = await fs.readFile(o("with-wikilinks"));
+	const content = `---
+---
+boom
+here is [[a link]]. and [[another]]
+and [[even more]]!
+`;
+
 	const expected = `---
 ---
 boom
 here is a link. and another
 and even more!
 `;
-
-	expect(output.toString("utf8")).toEqual(expected);
-});
-
-describe("put files in a subdirectory", () => {
-	test("based on type frontmatter property", async () => {
-		const basename = "with-type";
-		const input = await fs.readFile(i(basename));
-		await process({ basename, content: input.toString("utf8"), settings });
-		const output = await fs.readFile(o(`media/${basename}`));
-		expect(input).toEqual(output);
-	});
-
-	test("based on defaultSubdir setting", async () => {
-		const basename = "simple";
-		const input = await fs.readFile(i(basename));
-		await process({
-			basename,
-			content: input.toString("utf8"),
-			defaultSubdir: "media",
-			settings,
-		});
-		const output = await fs.readFile(o(`media/${basename}`));
-		expect(input).toEqual(output);
-	});
+	const output = stripWikilinks({ content, settings, slug });
+	expect(output.content).toEqual(expected);
 });
