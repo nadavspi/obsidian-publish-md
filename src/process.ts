@@ -10,7 +10,7 @@ import rewriteImages from "./rewriteImages";
 import type { PublishSettings } from "./types";
 
 interface Process {
-	basename: string | undefined;
+	basename: string;
 	content: string;
 	defaultSubdir?: string;
 	settings: PublishSettings;
@@ -42,7 +42,7 @@ export default async function process({
 		wikilinks,
 		removeNotes,
 		rewriteImages,
-	)({ content, slug, settings });
+	)({ content, slug, settings, basename });
 	const outputDir = [settings.outputPath, frontmatter.type || defaultSubdir]
 		.filter(Boolean)
 		.join("/");
