@@ -57,6 +57,7 @@ export default async function process({
 
 interface ImageFile {
 	arrayBuffer: Promise<ArrayBuffer>;
+	path: string;
 }
 
 class ImageProcessor {
