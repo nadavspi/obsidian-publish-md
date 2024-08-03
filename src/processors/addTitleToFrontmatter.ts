@@ -2,7 +2,7 @@ import type { ProcessorParams } from "../types";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 const addTitleToFrontmatter = (params: ProcessorParams): ProcessorParams => {
-    const [, frontmatterContent, body] = params.content.split("---");
+    const [, frontmatterContent, ...body] = params.content.split("---");
     const frontmatter = parseYaml(frontmatterContent) || {};
 
     if (!frontmatter.title) {
@@ -10,7 +10,7 @@ const addTitleToFrontmatter = (params: ProcessorParams): ProcessorParams => {
     }
 
     const updatedFrontmatter = stringifyYaml(frontmatter);
-    const content = `---\n${updatedFrontmatter}---${body}`;
+    const content = `---\n${updatedFrontmatter}---${body.join("---")}`;
 
     return {
         ...params,
