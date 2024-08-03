@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import type { ProcessorParams } from "./types";
+import type { ProcessorParams } from "../types";
 
 interface Image {
 	filename: string;
