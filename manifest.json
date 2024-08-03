@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-publish-md",
-	"name": "Publisher",
+	"id": "obsidian-courier",
+	"name": "Courier",
 	"version": "1.0.0",
 	"minAppVersion": "1.6.7",
 	"description": "Copy stuff over to my website",

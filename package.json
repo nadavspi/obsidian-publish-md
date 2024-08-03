@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-publish-md",
+	"name": "obsidian-courier",
 	"version": "1.0.0",
-	"description": "Copy stuff over to my website",
+	"description": "Copy files from Obsidian for publishing with Astro",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
