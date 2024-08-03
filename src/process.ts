@@ -5,7 +5,7 @@ import slugify from "slugify";
 import type Publish from "../main";
 import pipe from "./pipe";
 import removeNotes from "./processors/removeNotes";
-import stripWikilinks from "./processors/stripWikilinks";
+import wikilinks from "./processors/wikilinks";
 import rewriteImages from "./rewriteImages";
 import type { PublishSettings } from "./types";
 
@@ -39,7 +39,7 @@ export default async function process({
 		strict: true,
 	});
 	const { content: outputContent } = pipe(
-		stripWikilinks,
+		wikilinks,
 		removeNotes,
 		rewriteImages,
 	)({ content, slug, settings });

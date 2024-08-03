@@ -1,5 +1,5 @@
 import type { ProcessorParams } from "../types";
-const stripWikilinks = (params: ProcessorParams): ProcessorParams => {
+const wikilinks = (params: ProcessorParams): ProcessorParams => {
 	return {
 		...params,
 		content: params.content.replace(
@@ -15,4 +15,4 @@ const stripWikilinks = (params: ProcessorParams): ProcessorParams => {
 	};
 };
 
-export default stripWikilinks;
+export default wikilinks;

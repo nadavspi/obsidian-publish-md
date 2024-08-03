@@ -1,7 +1,6 @@
-import * as fs from "node:fs/promises";
 import removeNotes from "../src/processors/removeNotes";
-import stripWikilinks from "../src/processors/stripWikilinks";
-import { i, o, settings, slug } from "./test-helpers";
+import wikilinks from "../src/processors/wikilinks";
+import { settings, slug } from "./test-helpers";
 
 test("remove notes from the end of the file", async () => {
 	const content = `---
@@ -22,7 +21,7 @@ content
 	expect(output.content).toEqual(expected);
 });
 
-test("strip wikilinks", async () => {
+test("remove wikilinks", async () => {
 	const content = `---
 ---
 boom
@@ -36,6 +35,6 @@ boom
 here is a link. and another
 and even more!
 `;
-	const output = stripWikilinks({ content, settings, slug });
+	const output = wikilinks({ content, settings, slug });
 	expect(output.content).toEqual(expected);
 });
