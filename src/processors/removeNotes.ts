@@ -1,8 +1,10 @@
 import type { ProcessorParams } from "../types";
+
 const removeNotes = (params: ProcessorParams): ProcessorParams => {
+	const content = params.content.replace(/## Notes.*/s, "").trim();
 	return {
 		...params,
-		content: params.content.replace(/## Notes.*/s, ""),
+		content: `${content}\n`,
 	};
 };
 

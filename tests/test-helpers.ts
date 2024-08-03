@@ -23,6 +23,9 @@ export const makeContent = (strings: TemplateStringsArray, ...values: any[]): st
     const result = strings.reduce((acc, str, i) => {
         return acc + str + (values[i] || '');
     }, '');
-	// get rid of 2 spaces or tab at beginning of line 
-    return result.replace(/^( {2}|\t)*/gm, '').trim();
+    return result
+        .replace(/^( {2}|\t)*/gm, '')  // Remove leading whitespace
+        .replace(/\n+$/, '\n')  // Ensure only one trailing newline
+        .trim();  // Remove leading/trailing whitespace
 };
+
