@@ -1,4 +1,4 @@
-import rewriteImages, { parseImages } from "../src/rewriteImages";
+import rewriteImages, { parseImages } from "../src/processors/rewriteImages";
 import { makeParams, makeContent } from "./test-helpers";
 
 const contentAndImages = {
