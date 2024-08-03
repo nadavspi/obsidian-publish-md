@@ -25,7 +25,7 @@ export default async function process({
 	plugin,
 }: Process): Promise<string> {
 	const split = content.split("---");
-	if (split.length !== 3) {
+	if (split.length < 3) {
 		throw new Error("Invalid file: needs both frontmatter and content");
 	}
 	if (!basename) {

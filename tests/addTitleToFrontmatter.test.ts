@@ -75,3 +75,27 @@ test('preserves other frontmatter properties', () => {
         Some content here.
     `);
 });
+
+test('preserves --- within the content', () => {
+    const params = makeParams({
+        content: makeContent`
+            ---
+            ---
+            Some content here.
+
+			---
+			this is all content now
+        `,
+        basename: 'Test File'
+    });
+    const result = addTitleToFrontmatter(params);
+    expect(result.content).toEqual(makeContent`
+        ---
+        title: Test File
+        ---
+        Some content here.
+
+		---
+		this is all content now
+    `);
+});

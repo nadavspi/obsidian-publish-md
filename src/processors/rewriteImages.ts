@@ -31,7 +31,7 @@ const rewriteImages = (params: ProcessorParams): ProcessorParams => {
 		return params;
 	}
 
-	const [, frontmatter, body] = nextContent.split("---");
+	const [, frontmatter, ...body] = nextContent.split("---");
 	const imports = images.map(({ name, filename, ext }) => {
 		return `import ${name} from "./${params.slug}/${filename}.${ext}";`;
 	});
@@ -41,7 +41,7 @@ const rewriteImages = (params: ProcessorParams): ProcessorParams => {
 	const outputFrontmatter = ["---", frontmatter, "---"].join("");
 	return {
 		...params,
-		content: [outputFrontmatter, imageComponent, imports.join("\n"), body].join("\n"),
+		content: [outputFrontmatter, imageComponent, imports.join("\n"), body.join("---")].join("\n"),
 	};
 };
 export default rewriteImages;
