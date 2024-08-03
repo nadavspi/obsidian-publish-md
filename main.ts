@@ -27,7 +27,7 @@ export default class Publish extends Plugin {
 			editorCallback: async (editor: Editor) => {
 				try {
 					const content = editor.getValue();
-					const basename = this.app.workspace.getActiveFile()?.basename;
+					const basename = this.app.workspace.getActiveFile()?.basename || "";
 					const output = await process({
 						basename,
 						content,

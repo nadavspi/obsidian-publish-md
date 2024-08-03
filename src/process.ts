@@ -4,21 +4,17 @@ import { Notice, parseYaml } from "obsidian";
 import slugify from "slugify";
 import type Publish from "../main";
 import pipe from "./pipe";
+import removeNotes from "./processors/removeNotes";
+import wikilinks from "./processors/wikilinks";
 import rewriteImages from "./rewriteImages";
 import type { PublishSettings } from "./types";
 
 interface Process {
-	basename: string | undefined;
+	basename: string;
 	content: string;
 	defaultSubdir?: string;
 	settings: PublishSettings;
 	plugin: Publish;
-}
-
-export interface ProcessorParams {
-	content: string;
-	slug: string;
-	settings: PublishSettings;
 }
 
 export default async function process({
@@ -43,10 +39,10 @@ export default async function process({
 		strict: true,
 	});
 	const { content: outputContent } = pipe(
-		stripWikilinks,
+		wikilinks,
 		removeNotes,
 		rewriteImages,
-	)({ content, slug, settings });
+	)({ content, slug, settings, basename });
 	const outputDir = [settings.outputPath, frontmatter.type || defaultSubdir]
 		.filter(Boolean)
 		.join("/");
@@ -59,32 +55,9 @@ export default async function process({
 	return outputFile;
 }
 
-const removeNotes = (params: ProcessorParams): ProcessorParams => {
-	return {
-		...params,
-		content: params.content.replace(/## Notes.*/s, ""),
-	};
-};
-
-const stripWikilinks = (params: ProcessorParams): ProcessorParams => {
-	return {
-		...params,
-		content: params.content.replace(
-			// ([^\!]) capture, any char that isn't ! (to exclude media embeds)
-			// \[\[
-			// ([^\]]+) capture, any characters that aren't ]] or newline
-			// \]\]
-			/([^\!])\[\[([^\]]+)\]\]/gm,
-			(match, before, linkText) => {
-				return `${before}${linkText}`;
-			},
-		),
-	};
-};
-
 interface ImageFile {
-	path: string;
 	arrayBuffer: Promise<ArrayBuffer>;
+	path: string;
 }
 
 class ImageProcessor {
@@ -125,11 +98,11 @@ class ImageProcessor {
 				plugin.app.workspace.getActiveFile().path
 			],
 		);
-		const images = links
+		const images: ImageFile[] = links
 			.filter((link) =>
 				settings.imageFileExtensions.some((ext) => link.endsWith(ext)),
 			)
-			.map((path) => {
+			.map((path): ImageFile => {
 				const file = plugin.app.vault.getFileByPath(path);
 				if (!file) {
 					throw new Error(`Couldn't get the file ${path}`);

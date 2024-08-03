@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import { type ProcessorParams } from "./process";
+import type { ProcessorParams } from "./types";
 
 interface Image {
 	filename: string;
@@ -36,10 +36,12 @@ const rewriteImages = (params: ProcessorParams): ProcessorParams => {
 		return `import ${name} from "./${params.slug}/${filename}.${ext}";`;
 	});
 
+	const imageComponent = `import { Image } from "astro:assets";`;
+
 	const outputFrontmatter = ["---", frontmatter, "---"].join("");
 	return {
 		...params,
-		content: [outputFrontmatter, imports.join("\n"), body].join("\n"),
+		content: [outputFrontmatter, imageComponent, imports.join("\n"), body].join("\n"),
 	};
 };
 export default rewriteImages;
